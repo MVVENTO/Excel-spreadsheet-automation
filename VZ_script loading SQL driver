@@ -1,0 +1,253 @@
+#Author: Melissa A Vento
+#Date: 06/29/2022
+# Description: python script to automate an excel spreedsheet
+#              and dynamically update a new Column for each Month coming up
+#              Fully Automate this process using Database
+#              dot s
+
+#Install Libraires to create an excel spreedsheet
+from openpyxl import Workbook, load_workbook
+import pyodbc
+import pandas as pd
+import os
+
+
+#connect to sql database
+connection_string = ("Driver={SQL Server};""Server=gissql01;""Database=VisionZeroView;""UID=gisuser;""PWD=GISUSER;")
+connection = pyodbc.connect(connection_string)
+
+print("connected to sql database")
+
+
+
+# Open an excel file that already exists
+# file = pd.ExcelFile('C:\Users\mvento\Desktop\Python scripts\Copy of Vision Zero Metrics Jan 2022 to May 2022_20220616_MV.xlsx')
+file = load_workbook('C:\Users\mvento\Desktop\Python scripts\Copy of Vision Zero Metrics Jan 2022 to May 2022_20220616_MV.xlsx')
+
+
+ws = file['Sheet1']
+
+############ (New speed humps installed) ##########
+# updates (New speed humps installed)
+# Database Connections\VisionZeroView on DOTGISSQL01.sde\VisionZeroView.GISADMIN.Safety_Interventions\VisionZeroView.GISADMIN.VZV_Speed_Humps
+
+# Getting the data from sql into pandas dataframe (May 2022)
+data_m = pd.read_sql("SELECT * FROM gisadmin.VZV_SPEED_HUMPS WHERE (date_insta BETWEEN '2022-05-01 00:00:00.0000000' AND '2022-05-30 00:00:00.0000000') AND new_humps > 0 ", connection)
+
+# Getting the data from sql into pandas dataframe (June 2022)
+data_j = pd.read_sql("SELECT * FROM gisadmin.VZV_SPEED_HUMPS WHERE (date_insta BETWEEN '2022-06-01 00:00:00.0000000' AND '2022-06-30 00:00:00.0000000') AND new_humps > 0 ", connection)
+
+# Getting the data from sql into pandas dataframe (July 2022)
+data_jl = pd.read_sql("SELECT * FROM gisadmin.VZV_SPEED_HUMPS WHERE (date_insta BETWEEN '2022-07-01 00:00:00.0000000' AND '2022-07-30 00:00:00.0000000') AND new_humps > 0 ", connection)
+
+# Getting the data from sql into pandas dataframe (Aug 2022)
+data_a = pd.read_sql("SELECT * FROM gisadmin.VZV_SPEED_HUMPS WHERE (date_insta BETWEEN '2022-08-01 00:00:00.0000000' AND '2022-08-30 00:00:00.0000000') AND new_humps > 0 ", connection)
+
+
+# (New speed humps installed)
+ws.cell(row = 2, column=7).value = 0        #May
+ws.cell(row = 2, column=8).value = 0        #June
+ws.cell(row = 2, column=9).value = 0        #July
+ws.cell(row = 2, column=10).value = 0       #Aug
+ws.cell(row = 2, column=11).value = 0       #Sept
+ws.cell(row = 2, column=12).value = 0        #Oct
+ws.cell(row = 2, column=13).value = 0       #Nov
+ws.cell(row = 2, column=14).value = 0       #Dec
+
+
+############ (Safety projects (SIPs) completed – VZ priority geographies only) ##########
+
+# updates (Safety projects (SIPs) completed – VZ priority geographies only)
+ws.cell(row = 3, column=7).value = 'N/A'        #May
+ws.cell(row = 3, column=8).value = 'N/A'        #June
+ws.cell(row = 3, column=9).value = 'N/A'        #July
+ws.cell(row = 3, column=10).value = 'N/A'       #Aug
+ws.cell(row = 3, column=11).value = 'N/A'       #Sept
+ws.cell(row = 3, column=12).value = 'N/A'        #Oct
+ws.cell(row = 3, column=13).value = 'N/A'       #Nov
+ws.cell(row = 3, column=14).value = 'N/A'       #Dec
+
+
+
+############ (Safety projects (SIPs) completed – all projects) ##########
+
+# Getting the data from sql into pandas dataframe (June 2022)
+safety_june = pd.read_sql(" SELECT c.OBJECTID, C.pjct_name, c.sip_year, c.end_date, c.Shape,I.OBJECTID, I.pjct_name, I.sip_year, I.end_date, I.Shape FROM gisadmin.VZV_SIP_Corridors AS c, gisadmin.VZV_SIP_Intersections AS I WHERE c.sip_year = 2022 and I.sip_year = 2022 and ((C.end_date BETWEEN '2022-06-01 00:00:00.0000000' AND '2022-06-30 00:00:00.0000000') and (I.end_date BETWEEN '2022-06-01 00:00:00.0000000' AND '2022-06-30 00:00:00.0000000'))  ", connection)
+safety_july = pd.read_sql(" SELECT c.OBJECTID, C.pjct_name, c.sip_year, c.end_date, c.Shape,I.OBJECTID, I.pjct_name, I.sip_year, I.end_date, I.Shape FROM gisadmin.VZV_SIP_Corridors AS c, gisadmin.VZV_SIP_Intersections AS I WHERE c.sip_year = 2022 and I.sip_year = 2022 and ((C.end_date BETWEEN '2022-07-01 00:00:00.0000000' AND '2022-07-30 00:00:00.0000000') and (I.end_date BETWEEN '2022-07-01 00:00:00.0000000' AND '2022-07-30 00:00:00.0000000'))  ", connection)
+safety_aug = pd.read_sql(" SELECT c.OBJECTID, C.pjct_name, c.sip_year, c.end_date, c.Shape,I.OBJECTID, I.pjct_name, I.sip_year, I.end_date, I.Shape FROM gisadmin.VZV_SIP_Corridors AS c, gisadmin.VZV_SIP_Intersections AS I WHERE c.sip_year = 2022 and I.sip_year = 2022 and ((C.end_date BETWEEN '2022-08-01 00:00:00.0000000' AND '2022-08-30 00:00:00.0000000') and (I.end_date BETWEEN '2022-08-01 00:00:00.0000000' AND '2022-08-30 00:00:00.0000000'))  ", connection)
+safety_sept = pd.read_sql(" SELECT c.OBJECTID, C.pjct_name, c.sip_year, c.end_date, c.Shape,I.OBJECTID, I.pjct_name, I.sip_year, I.end_date, I.Shape FROM gisadmin.VZV_SIP_Corridors AS c, gisadmin.VZV_SIP_Intersections AS I WHERE c.sip_year = 2022 and I.sip_year = 2022 and ((C.end_date BETWEEN '2022-09-01 00:00:00.0000000' AND '2022-09-30 00:00:00.0000000') and (I.end_date BETWEEN '2022-09-01 00:00:00.0000000' AND '2022-09-30 00:00:00.0000000'))  ", connection)
+safety_oct = pd.read_sql(" SELECT c.OBJECTID, C.pjct_name, c.sip_year, c.end_date, c.Shape,I.OBJECTID, I.pjct_name, I.sip_year, I.end_date, I.Shape FROM gisadmin.VZV_SIP_Corridors AS c, gisadmin.VZV_SIP_Intersections AS I WHERE c.sip_year = 2022 and I.sip_year = 2022 and ((C.end_date BETWEEN '2022-10-01 00:00:00.0000000' AND '2022-10-30 00:00:00.0000000') and (I.end_date BETWEEN '2022-10-01 00:00:00.0000000' AND '2022-10-30 00:00:00.0000000'))  ", connection)
+safety_nov = pd.read_sql(" SELECT c.OBJECTID, C.pjct_name, c.sip_year, c.end_date, c.Shape,I.OBJECTID, I.pjct_name, I.sip_year, I.end_date, I.Shape FROM gisadmin.VZV_SIP_Corridors AS c, gisadmin.VZV_SIP_Intersections AS I WHERE c.sip_year = 2022 and I.sip_year = 2022 and ((C.end_date BETWEEN '2022-11-01 00:00:00.0000000' AND '2022-11-30 00:00:00.0000000') and (I.end_date BETWEEN '2022-11-01 00:00:00.0000000' AND '2022-11-30 00:00:00.0000000'))  ", connection)
+safety_dec = pd.read_sql(" SELECT c.OBJECTID, C.pjct_name, c.sip_year, c.end_date, c.Shape,I.OBJECTID, I.pjct_name, I.sip_year, I.end_date, I.Shape FROM gisadmin.VZV_SIP_Corridors AS c, gisadmin.VZV_SIP_Intersections AS I WHERE c.sip_year = 2022 and I.sip_year = 2022 and ((C.end_date BETWEEN '2022-12-01 00:00:00.0000000' AND '2022-12-30 00:00:00.0000000') and (I.end_date BETWEEN '2022-12-01 00:00:00.0000000' AND '2022-12-30 00:00:00.0000000'))  ", connection)
+
+
+# Database Connections\VisionZeroView on DOTGISSQL01.sde\VisionZeroView.GISADMIN.Safety_Interventions\VisionZeroView.GISADMIN.VZV_SIP_Corridors
+# Database Connections\VisionZeroView on DOTGISSQL01.sde\VisionZeroView.GISADMIN.Safety_Interventions\VisionZeroView.GISADMIN.VZV_SIP_Intersections
+
+#Updates (Safety projects (SIPs) completed – all projects)
+ws.cell(row = 4, column=7).value = 0        #May
+ws.cell(row = 4, column=8).value = 2       #June
+ws.cell(row = 4, column=9).value = 0        #July
+ws.cell(row = 4, column=10).value = 0       #Aug
+ws.cell(row = 4, column=11).value = 0       #Sept
+ws.cell(row = 4, column=12).value = 0        #Oct
+ws.cell(row = 4, column=13).value = 0       #Nov
+ws.cell(row = 4, column=14).value = 0       #Dec
+
+
+############ (Enhanced crossings completed ) ##########
+
+#Crossing = pd.read_sql("SELECT COUNT (*) FROM gisadmin.VZV_Enhanced_Crossings WHERE Date_Imple BETWEEN '2022-01-01 00:00:00.0000000' AND '2022-08-30 00:00:00.0000000'")
+#Database Connections\VisionZeroView on DOTGISSQL01.sde\VisionZeroView.GISADMIN.Safety_Interventions\VisionZeroView.GISADMIN.VZV_Enhanced_Crossings
+#Updates (Enhanced crossings completed )
+ws.cell(row = 5, column=7).value = 0        #May
+ws.cell(row = 5, column=8).value = 0        #June
+ws.cell(row = 5, column=9).value = 0        #July
+ws.cell(row = 5, column=10).value = 0       #Aug
+ws.cell(row = 5, column=11).value = 0       #Sept
+ws.cell(row = 5, column=12).value = 0        #Oct
+ws.cell(row = 5, column=13).value = 0       #Nov
+ws.cell(row = 5, column=14).value = 0       #Dec
+
+
+
+############ (Turn traffic calming treatments installed) ##########
+
+traffic_May = pd.read_sql("SELECT COUNT (*) FROM gisadmin.VZV_Turn_Traffic_Calming WHERE completion BETWEEN '2022-05-01 00:00:00.0000000' AND '2022-05-30 00:00:00.0000000'", connection)
+traffic_june = pd.read_sql("SELECT * FROM gisadmin.VZV_Turn_Traffic_Calming WHERE completion BETWEEN '2022-06-01 00:00:00.0000000' AND '2022-06-30 00:00:00.0000000'", connection)
+traffic_july = pd.read_sql("SELECT COUNT (*) FROM gisadmin.VZV_Turn_Traffic_Calming WHERE completion BETWEEN '2022-07-01 00:00:00.0000000' AND '2022-07-30 00:00:00.0000000'", connection)
+traffic_aug = pd.read_sql("SELECT * FROM gisadmin.VZV_Turn_Traffic_Calming WHERE completion BETWEEN '2022-08-01 00:00:00.0000000' AND '2022-08-30 00:00:00.0000000'", connection)
+traffic_sept = pd.read_sql("SELECT COUNT (*) FROM gisadmin.VZV_Turn_Traffic_Calming WHERE completion BETWEEN '2022-09-01 00:00:00.0000000' AND '2022-09-30 00:00:00.0000000'", connection)
+traffic_oct = pd.read_sql("SELECT * FROM gisadmin.VZV_Turn_Traffic_Calming WHERE completion BETWEEN '2022-10-01 00:00:00.0000000' AND '2022-10-30 00:00:00.0000000'", connection)
+traffic_nov = pd.read_sql("SELECT COUNT (*) FROM gisadmin.VZV_Turn_Traffic_Calming WHERE completion BETWEEN '2022-11-01 00:00:00.0000000' AND '2022-11-30 00:00:00.0000000'", connection)
+traffic_dec = pd.read_sql("SELECT * FROM gisadmin.VZV_Turn_Traffic_Calming WHERE completion BETWEEN '2022-12-01 00:00:00.0000000' AND '2022-12-30 00:00:00.0000000'", connection)
+
+#Database Connections\VisionZeroView on DOTGISSQL01.sde\VisionZeroView.GISADMIN.Safety_Interventions\VisionZeroView.GISADMIN.VZV_Turn_Traffic_Calming
+
+#Updates (Turn traffic calming treatments installed)
+ws.cell(row = 6, column=7).value = 65        #May
+ws.cell(row = 6, column=8).value = 0        #June
+ws.cell(row = 6, column=9).value = 2        #July
+ws.cell(row = 6, column=10).value = 6       #Aug
+ws.cell(row = 6, column=11).value = 0       #Sept
+ws.cell(row = 6, column=12).value = 0        #Oct
+ws.cell(row = 6, column=13).value = 0       #Nov
+ws.cell(row = 6, column=14).value = 0       #Dec
+
+
+############ (New traffic signals installed) ##########
+
+Signals = pd.read_sql("SELECT * FROM GISGRID.GISADMIN.Signal_Controller", connection)
+# Database Connections\GISGRID on DOTGISSQL01.sde\GISGRID.GISADMIN.TRAFFIC_PLANNING\GISGRID.GISADMIN.Signal_Controller
+#Updates (New traffic signals installed)
+ws.cell(row = 7, column=7).value = 0        #May
+ws.cell(row = 7, column=8).value = 0        #June
+ws.cell(row = 7, column=9).value = 0        #July
+ws.cell(row = 7, column=10).value = 0       #Aug
+ws.cell(row = 7, column=11).value = 0       #Sept
+ws.cell(row = 7, column=12).value = 0        #Oct
+ws.cell(row = 7, column=13).value = 0       #Nov
+ws.cell(row = 7, column=14).value = 0       #Dec
+
+
+
+# Database Connections\VisionZeroView on DOTGISSQL01.sde\VisionZeroView.GISADMIN.Safety_Interventions\VisionZeroView.GISADMIN.VZV_Leading_Pedestrian_Intervals
+Intervals_may = pd.read_sql("SELECT Count (*) FROM gisadmin.VZV_Leading_Pedestrian_Intervals WHERE Install_Date BETWEEN '2022-05-01 00:00:00.0000000' AND '2022-05-30 00:00:00.0000000'", connection)
+Intervals_june = pd.read_sql("SELECT Count (*) FROM gisadmin.VZV_Leading_Pedestrian_Intervals WHERE Install_Date BETWEEN '2022-06-01 00:00:00.0000000' AND '2022-06-30 00:00:00.0000000'", connection)
+Intervals_july = pd.read_sql("SELECT Count (*) FROM gisadmin.VZV_Leading_Pedestrian_Intervals WHERE Install_Date BETWEEN '2022-07-01 00:00:00.0000000' AND '2022-07-30 00:00:00.0000000'", connection)
+Intervals_aug = pd.read_sql("SELECT Count (*) FROM gisadmin.VZV_Leading_Pedestrian_Intervals WHERE Install_Date BETWEEN '2022-08-01 00:00:00.0000000' AND '2022-08-30 00:00:00.0000000'", connection)
+Intervals_sept = pd.read_sql("SELECT Count (*) FROM gisadmin.VZV_Leading_Pedestrian_Intervals WHERE Install_Date BETWEEN '2022-09-01 00:00:00.0000000' AND '2022-09-30 00:00:00.0000000'", connection)
+Intervals_oct = pd.read_sql("SELECT Count (*) FROM gisadmin.VZV_Leading_Pedestrian_Intervals WHERE Install_Date BETWEEN '2022-10-01 00:00:00.0000000' AND '2022-10-30 00:00:00.0000000'", connection)
+Intervals_nov = pd.read_sql("SELECT Count (*) FROM gisadmin.VZV_Leading_Pedestrian_Intervals WHERE Install_Date BETWEEN '2022-11-01 00:00:00.0000000' AND '2022-11-30 00:00:00.0000000'", connection)
+Intervals_dec = pd.read_sql("SELECT Count (*) FROM gisadmin.VZV_Leading_Pedestrian_Intervals WHERE Install_Date BETWEEN '2022-12-01 00:00:00.0000000' AND '2022-12-30 00:00:00.0000000'", connection)
+
+#Updates (Leading pedestrian intervals installed)
+ws.cell(row = 8, column=7).value = 248       #May
+ws.cell(row = 8, column=8).value = 142        #June
+ws.cell(row = 8, column=9).value = 150        #July
+ws.cell(row = 8, column=10).value = 0       #Aug
+ws.cell(row = 8, column=11).value = 0       #Sept
+ws.cell(row = 8, column=12).value = 0        #Oct
+ws.cell(row = 8, column=13).value = 0       #Nov
+ws.cell(row = 8, column=14).value = 0       #Dec
+
+
+
+# Database Connections\VisionZeroView on DOTGISSQL01.sde\VisionZeroView.GISADMIN.Outreach\VisionZeroView.GISADMIN.VZV_Outreach_Schools
+
+#outreach_may = pd.read_sql("SELECT COUNT (*) FROM gisadmin.VZV_Outreach_Schools WHERE SiteServed in(SELECT SiteServed FROM gisadmin.VZV_Outreach_Schools GROUP BY SiteServed HAVING COUNT(SiteServed)=1) and EventDate  LIKE '5/_/2022' OR EventDate LIKE '5/__/2022';", connection)
+#outreach_june = pd.read_sql("SELECT COUNT (*) FROM gisadmin.VZV_Outreach_Schools WHERE SiteServed in(SELECT SiteServed FROM gisadmin.VZV_Outreach_Schools GROUP BY SiteServed HAVING COUNT(SiteServed)=1) and EventDate  LIKE '6/_/2022' OR EventDate LIKE '6/__/2022';", connection)
+#outreach_july = pd.read_sql("SELECT COUNT (*) FROM gisadmin.VZV_Outreach_Schools WHERE SiteServed in(SELECT SiteServed FROM gisadmin.VZV_Outreach_Schools GROUP BY SiteServed HAVING COUNT(SiteServed)=1) and EventDate  LIKE '7/_/2022' OR EventDate LIKE '7/__/2022';", connection)
+#outreach_aug = pd.read_sql("SELECT COUNT (*) FROM gisadmin.VZV_Outreach_Schools WHERE SiteServed in(SELECT SiteServed FROM gisadmin.VZV_Outreach_Schools GROUP BY SiteServed HAVING COUNT(SiteServed)=1) and EventDate  LIKE '8/_/2022' OR EventDate LIKE '8/__/2022';", connection)
+#outreach_sept = pd.read_sql("SELECT COUNT (*) FROM gisadmin.VZV_Outreach_Schools WHERE SiteServed in(SELECT SiteServed FROM gisadmin.VZV_Outreach_Schools GROUP BY SiteServed HAVING COUNT(SiteServed)=1) and EventDate  LIKE '9/_/2022' OR EventDate LIKE '9/__/2022';", connection)
+#outreach_oct = pd.read_sql("SELECT COUNT (*) FROM gisadmin.VZV_Outreach_Schools WHERE SiteServed in(SELECT SiteServed FROM gisadmin.VZV_Outreach_Schools GROUP BY SiteServed HAVING COUNT(SiteServed)=1) and EventDate  LIKE '10/_/2022' OR EventDate LIKE '10/__/2022';", connection)
+#outreach_nov = pd.read_sql("SELECT COUNT (*) FROM gisadmin.VZV_Outreach_Schools WHERE SiteServed in(SELECT SiteServed FROM gisadmin.VZV_Outreach_Schools GROUP BY SiteServed HAVING COUNT(SiteServed)=1) and EventDate  LIKE '11/_/2022' OR EventDate LIKE '11/__/2022';", connection)
+#outreach_dec = pd.read_sql("SELECT COUNT (*) FROM gisadmin.VZV_Outreach_Schools WHERE SiteServed in(SELECT SiteServed FROM gisadmin.VZV_Outreach_Schools GROUP BY SiteServed HAVING COUNT(SiteServed)=1) and EventDate  LIKE '12/_/2022' OR EventDate LIKE '12/__/2022';", connection)
+
+
+#Updates (Schools with targeted educational programs and outreach completed)
+# SiteServed 
+ws.cell(row = 9, column=7).value = 60       #May
+ws.cell(row = 9, column=8).value = 27        #June
+ws.cell(row = 9, column=9).value = 6        #July
+ws.cell(row = 9, column=10).value = 0       #Aug
+ws.cell(row = 9, column=11).value = 0       #Sept
+ws.cell(row = 9, column=12).value = 0        #Oct
+ws.cell(row = 9, column=13).value = 0       #Nov
+ws.cell(row = 9, column=14).value = 0       #Dec
+
+
+
+# Database Connections\VisionZeroView on DOTGISSQL01.sde\VisionZeroView.GISADMIN.Outreach\VisionZeroView.GISADMIN.VZV_Senior_Centers
+#Updates (Senior centers partnered with at priority/high-crash neighborhoods)
+
+#Senior_may = pd.read_sql("SELECT Count (*) FROM gisadmin.VZV_Senior_Centers WHERE EventDate LIKE '5/_/2022' OR EventDate LIKE '5/__/2022'", connection)
+#Senior_june = pd.read_sql("SELECT Count (*) FROM gisadmin.VZV_Senior_Centers WHERE EventDate LIKE '6/_/2022' OR EventDate LIKE '6/__/2022'", connection)
+#Senior_july = pd.read_sql("SELECT Count (*) FROM gisadmin.VZV_Senior_Centers WHERE EventDate LIKE '7/_/2022' OR EventDate LIKE '7/__/2022'", connection)
+#Senior_aug = pd.read_sql("SELECT Count (*) FROM gisadmin.VZV_Senior_Centers WHERE EventDate LIKE '8/_/2022' OR EventDate LIKE '8/__/2022'", connection)
+#Senior_sept = pd.read_sql(" SELECT Count (*) FROM gisadmin.VZV_Senior_Centers WHERE EventDate LIKE '9/_/2022' OR EventDate LIKE '9/__/2022'", connection)
+#Senior_oct = pd.read_sql("SELECT Count (*) FROM gisadmin.VZV_Senior_Centers WHERE EventDate LIKE '10/_/2022' OR EventDate LIKE '10/__/2022'", connection)
+#Senior_nov = pd.read_sql("SELECT Count (*) FROM gisadmin.VZV_Senior_Centers WHERE EventDate LIKE '11/_/2022' OR EventDate LIKE '11/__/2022'", connection)
+#Senior_dec = pd.read_sql("SELECT Count (*) FROM gisadmin.VZV_Senior_Centers WHERE EventDate LIKE '12/_/2022' OR EventDate LIKE '12/__/2022'", connection)
+
+
+ws.cell(row = 10, column=7).value = 33       #May
+ws.cell(row = 10, column=8).value = 24       #June
+ws.cell(row = 10, column=9).value = 8        #July
+ws.cell(row = 10, column=10).value = 0       #Aug
+ws.cell(row = 10, column=11).value = 0       #Sept
+ws.cell(row = 10, column=12).value = 0        #Oct
+ws.cell(row = 10, column=13).value = 0       #Nov
+ws.cell(row = 10, column=14).value = 0       #Dec
+
+
+# Database Connections\VisionZeroView on DOTGISSQL01.sde\VisionZeroView.GISADMIN.Outreach\VisionZeroView.GISADMIN.VZV_Hands_On_Safety_Demos
+
+#Updates (Events conducted for hands-on safety demonstrations)
+
+#Hands_on_may = pd.read_sql("SELECT COUNT (*) FROM GISADMIN.VZV_Hands_On_Safety_Demos WHERE Event_Date LIKE '5/_/2022' OR Event_Date LIKE '5/__/2022'")
+#Hands_on_june = pd.read_sql("SELECT COUNT (*) FROM GISADMIN.VZV_Hands_On_Safety_Demos WHERE Event_Date LIKE '6/_/2022' OR Event_Date LIKE '6/__/2022'")
+#Hands_on_july = pd.read_sql("SELECT COUNT (*) FROM GISADMIN.VZV_Hands_On_Safety_Demos WHERE Event_Date LIKE '7/_/2022' OR Event_Date LIKE '7/__/2022'")
+#Hands_on_aug = pd.read_sql("SELECT COUNT (*) FROM GISADMIN.VZV_Hands_On_Safety_Demos WHERE Event_Date LIKE '8/_/2022' OR Event_Date LIKE '8/__/2022'")
+#Hands_on_sept = pd.read_sql("SELECT COUNT (*) FROM GISADMIN.VZV_Hands_On_Safety_Demos WHERE Event_Date LIKE '9/_/2022' OR Event_Date LIKE '9/__/2022'")
+#Hands_on_oct = pd.read_sql("SELECT COUNT (*) FROM GISADMIN.VZV_Hands_On_Safety_Demos WHERE Event_Date LIKE '10/_/2022' OR Event_Date LIKE '10/__/2022'")
+#Hands_on_nov = pd.read_sql("SELECT COUNT (*) FROM GISADMIN.VZV_Hands_On_Safety_Demos WHERE Event_Date LIKE '11/_/2022' OR Event_Date LIKE '11/__/2022'")
+#Hands_on_dec = pd.read_sql(" SELECT COUNT (*) FROM GISADMIN.VZV_Hands_On_Safety_Demos WHERE Event_Date LIKE '12/_/2022' OR Event_Date LIKE '12/__/2022'")
+
+
+ws.cell(row = 11, column=7).value = 0        #May
+ws.cell(row = 11, column=8).value = 35        #June
+ws.cell(row = 11, column=9).value = 32        #July
+ws.cell(row = 11, column=10).value = 0       #Aug
+ws.cell(row = 11, column=11).value = 0       #Sept
+ws.cell(row = 11, column=12).value = 0        #Oct
+ws.cell(row = 11, column=13).value = 0       #Nov
+ws.cell(row = 11, column=14).value = 0       #Dec
+
+
+
+
+
+
+file.save("Vision Zero Metrics_Test.xlsx")
+print('Upload file created ...')
